@@ -1,4 +1,4 @@
-# CalenderAPI
+# CalendarAPI
 
 _Needs_:
  -  Python installed.
@@ -12,7 +12,7 @@ _Needs_:
    
 Currently runs on Python 3.12.3.
 
-**Prototype for CalenderAPI.** Works to pull subject, date and time, and location for a selected amount of time. Start and end time are fixed.
+**Prototype for CalendarAPI.** Works to pull subject, date and time, and location for a selected amount of time. Start and end time are fixed.
 --------------
 **Update** Now there is a GUI for this program.
  - Main GUI is under main.py - this one is the main one not to mess with until we know for sure.
