@@ -1,0 +1,99 @@
+import tkinter as tk
+from PIL import Image, ImageTk
+import random
+
+def display_event_info(canvas, event, row, column, max_font_size=16):
+    event_frame = tk.Frame(canvas, relief=tk.RAISED, borderwidth=1, bg="white")
+    event_frame.grid(row=row, column=column, padx=10, pady=10, sticky="nsew")
+
+    subject_label = tk.Label(event_frame, text=f"{event['subject']}", bg="lightblue", fg="black", font=("Arial", max_font_size, "bold"))
+    subject_label.grid(row=0, column=0, columnspan=2, padx=5, pady=2, sticky="w")
+
+    start_label = tk.Label(event_frame, text=f"Start Time: {event['start_datetime']}", bg="lightgreen", fg="black", font=("Arial", max_font_size - 2))
+    start_label.grid(row=1, column=0, padx=5, pady=2, sticky="w")
+
+    end_label = tk.Label(event_frame, text=f"End Time: {event['end_datetime']}", bg="lightcoral", fg="black", font=("Arial", max_font_size - 2))
+    end_label.grid(row=1, column=1, padx=5, pady=2, sticky="w")
+
+    location_label = tk.Label(event_frame, text=f"Location: {event['location']}", bg="white", fg="black", font=("Arial", max_font_size - 2))
+    location_label.grid(row=2, column=0, columnspan=2, padx=5, pady=2, sticky="w")
+
+    body_label = tk.Label(event_frame, text=event.get('body', ''), bg="white", fg="black", font=("Arial", max_font_size - 2))
+    body_label.grid(row=3, column=0, columnspan=2, padx=5, pady=2, sticky="w")
+
+def place_image(root, image_path):
+    img = Image.open(image_path)
+    img = img.convert("RGBA")
+    target_width = 100
+    target_height = 100
+    img = img.resize((target_width, target_height), Image.LANCZOS)
+    photo_img = ImageTk.PhotoImage(img)
+    image_label = tk.Label(root, image=photo_img, bg="gray")
+    image_label.image = photo_img
+    image_label.place(relx=0.95, rely=0.95, anchor=tk.SE)
+
+def generate_sample_events_with_body_text(num_events):
+    events = []
+    for i in range(1, num_events + 1):
+        num_lines = random.choice([3, 5, 10])  # Random number of lines for the body text
+        body_text = '\n'.join([f'This is line {j+1} of the body text.' for j in range(num_lines)])
+        event = {
+            'subject': f'Event {i}',
+            'start_datetime': '2024-04-23 08:00 AM',
+            'end_datetime': '2024-04-23 10:00 AM',
+            'location': f'Location {i}',
+            'body': body_text
+        }
+        events.append(event)
+    return events
+
+
+
+def start_scroll(canvas, initial_scroll_speed):
+    canvas.after(5000, scroll_events, canvas, initial_scroll_speed)
+
+def scroll_events(canvas, y_scroll_speed):
+    canvas.yview_moveto(y_scroll_speed)
+    current_y = float(canvas.yview()[0])
+    if current_y >= 1.0:
+        scroll_events(canvas, 0.0)  # Reset scrollbar to top
+
+    else:
+        remaining_distance = 1.0 - current_y
+        scroll_speed = min(remaining_distance * 0.01, 0.0016)  # Adjust scroll speed here
+        canvas.after(100, scroll_events, canvas, current_y + scroll_speed)    
+
+def main():
+    root = tk.Tk()
+    root.title("Event Information")
+    root.configure(bg="gray")
+
+    root.attributes('-fullscreen', True)
+
+    canvas = tk.Canvas(root, bg="grey", highlightthickness=0)
+    canvas.pack(fill=tk.BOTH, expand=True)
+
+    scroll_frame = tk.Frame(canvas, bg="grey")
+    scroll_frame.pack(fill=tk.BOTH, padx=10, pady=10)
+
+    sample_events_with_body_text = generate_sample_events_with_body_text(9)
+
+    for i, event in enumerate(sample_events_with_body_text):
+        row = i // 2
+        column = i % 2
+        display_event_info(scroll_frame, event, row, column)
+
+    place_image(root, "dpatransparent.png")
+
+    canvas.create_window((0, 0), window=scroll_frame, anchor=tk.NW)
+
+    canvas.update_idletasks()
+    canvas.config(scrollregion=canvas.bbox("all"))
+
+    initial_scroll_speed = 0.0016
+    start_scroll(canvas, initial_scroll_speed)
+
+    root.mainloop()
+
+if __name__ == "__main__":
+    main()#
